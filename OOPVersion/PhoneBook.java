@@ -12,7 +12,7 @@ public class PhoneBook{
 	}
 
 	public static void add(String record, BST numberTree, BST nameTree){
-		String[] s = record.split(",");
+		String[] s = record.split(", ");
 		String name = s[0];
 		String address = s[1];
 		String number = s[2];
@@ -23,24 +23,31 @@ public class PhoneBook{
 
 	public static void delete(String value, BST numberTree, BST nameTree){
 		try{
-			Integer.parseInt(value.substring(0));
+			Integer.parseInt(value.substring(0, 1));
 			Node record = numberTree.find(value);
-			//System.out.println(record);
+			System.out.println(record);
 			nameTree.delete(record.name);
 			numberTree.delete(value);
-
 		} 
 		catch(NumberFormatException error){
 			Node record = nameTree.find(value);
-			//System.out.println(record);
-			//numberTree.delete(record.number);
+			numberTree.delete(record.number);
 			nameTree.delete(value);
 		}
 	}
-	//// Add look up ///
+	public static void find(String value, BST numberTree, BST nameTree){
+		try{
+			Integer.parseInt(value.substring(0, 1));
+			System.out.print(numberTree.find(value));
+
+		} 
+		catch(NumberFormatException error){
+			System.out.print(nameTree.find(value));
+		}
+	}
 
 	public static void print(BST nameTree){
-		nameTree.traverse();
+		numberTree.traverse();
 	}
 
 	public static void main(String[] args){
@@ -57,13 +64,13 @@ public class PhoneBook{
 		while(scanner.hasNextLine()) {
 			String record = scanner.nextLine();
 			add(record, numberTree, nameTree);
-			//System.out.println("Inserted record: " + data);
 		}
 		scanner.close();
 
 	    scanner = new Scanner(System.in);
 	    System.out.print("\nType add followed by name, address, number to add a record\ne.g add James Toscano, 38 Carolyns Circle Dallas, 214-7462-112\n\n" +
 	    	"Type delete followed by a name or number to delete that record\ne.g delete James Toscano\n\n" + 
+	    	"Type find followed by a name or a number to find that record\ne.g James Toscano\n\n" +
 	    	"Type print to list all records\n\n" +
 	    	"Type quit to stop the program\n");
 	    boolean keepGoing = true;
@@ -79,11 +86,17 @@ public class PhoneBook{
 		    else if(action.equals("delete")){
 		    	delete(command.substring(7, command.length()), numberTree, nameTree);
 		    }
+		    else if(action.equals("find")){
+		    	find(command.substring(5, command.length()), numberTree, nameTree);
+		    }
 		    else if(action.equals("print")){
 		    	print(nameTree);
 		    }
 		    else if(action.equals("quit")){
 		    	keepGoing = false;
+		    }
+		    else{
+		    	System.out.println("Command not found. Try again.");
 		    }
 		}
 	}

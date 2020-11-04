@@ -23,7 +23,7 @@ public abstract class BST{
 		else{
 			node.right = recAdd(node.right, newNode, value);
 		}
-		//Check to see why its producing an erroe
+		//Check to see why its producing an error
 		//System.out.print("Error" + value + node.isGreaterThan(value) + "\n");
 		return node;
 	}
@@ -48,10 +48,7 @@ public abstract class BST{
 		Node parent = node;
 		if(node.isEqual(value)){
 			if(node.left != null){
-				//System.out.println(node.root);
-				node = node.left;
-				//this.recTraverse(node);
-				//System.out.println(node.root);		
+				node = node.left;	
 			}
 			else if(node.right != null){
 				node = node.right;
@@ -62,7 +59,6 @@ public abstract class BST{
 		}
 		else{
 			while(!(node.isEqual(value))){
-				// System.out.print(node.id + " " + value + "\n");
 				if(node.isLessThan(value)){
 					parent = node;
 					node = node.right;
@@ -71,11 +67,9 @@ public abstract class BST{
 					parent = node;
 					node = node.left;
 				}
-				//System.out.print("\n" + node.value);
 			}
 
 			if(node.left == null && node.right == null){
-				//System.out.print("Here");
 				if(parent.left.isEqual(value)){
 					parent.left = null;
 				}
@@ -88,7 +82,6 @@ public abstract class BST{
 					parent.left = node.right;
 				}
 				else{
-					//System.out.print("Here");
 					parent.right = node.left;	
 				}
 			}
