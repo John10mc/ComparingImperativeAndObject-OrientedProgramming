@@ -1,5 +1,4 @@
 public class Node{
-	String id;
 	String name;
 	String address;
 	String number;
