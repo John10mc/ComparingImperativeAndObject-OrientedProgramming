@@ -1,9 +1,4 @@
 public abstract class BST{
-	Node root;
-
-	public BST(){
-		root = null;
-	}
 
 	public abstract void add(Node node);
 
@@ -13,104 +8,83 @@ public abstract class BST{
 
 	public abstract void traverse();
 
-	public Node recAdd(Node node, Node newNode, String value){
+	public Node recAdd(Node node, Node newNode, String value, boolean isNumber){
 		if(node == null){
 			return newNode;
 		}
-		if(node.isGreaterThan(value)){
-			node.left = recAdd(node.left, newNode, value);
+		if(node.isGreaterThan(value, isNumber)){
+			node.setLeft(recAdd(node.getLeft(isNumber), newNode, value, isNumber), isNumber);
 		}
 		else{
-			node.right = recAdd(node.right, newNode, value);
+			node.setRight(recAdd(node.getRight(isNumber), newNode, value, isNumber), isNumber);
 		}
 		//Check to see why its producing an error
 		//System.out.print("Error" + value + node.isGreaterThan(value) + "\n");
 		return node;
 	}
 
-	public Node recFind(Node node, String value){
+	public Node recFind(Node node, String value, boolean isNumber){
 		if(node == null){
 			return node;
 		}
 		// try using isEqual
-		else if(node.id.equals(value)){
+		else if(node.isEqual(value, isNumber)){
 			return node;
 		}
-		else if(node.isGreaterThan(value)){
-			return recFind(node.left, value);
+		else if(node.isGreaterThan(value, isNumber)){
+			return recFind(node.getLeft(isNumber), value, isNumber);
 		}
 		else{
-			return recFind(node.right, value);
+			return recFind(node.getRight(isNumber), value, isNumber);
 		}
 	}
 
-	public void deleteNode(Node node, String value){
-		Node parent = node;
-		if(node.isEqual(value)){
-			if(node.left != null){
-				node = node.left;	
-			}
-			else if(node.right != null){
-				node = node.right;
-			}
-			else{
-				node = null;
-			}
-		}
-		else{
-			while(!(node.isEqual(value))){
-				if(node.isLessThan(value)){
-					parent = node;
-					node = node.right;
-				}
-				else{
-					parent = node;
-					node = node.left;
-				}
-			}
+	public Node recDelete(Node node, String value, boolean isNumber){
+		if (node == null) {
+            return null;
+        }
+     
+        if (node.isEqual(value, isNumber)) {
+            if (node.getLeft(isNumber) == null && node.getRight(isNumber) == null) {
+                return null;
+            }
+            else if (node.getLeft(isNumber) == null ^ node.getRight(isNumber) == null) {
+                if(node.getLeft(isNumber) == null){
+                    return node.getRight(isNumber);
+                }
+                else{
+                    return node.getLeft(isNumber);
+                }
+            }
+            else{
+                Node minNode = node.getRight(isNumber);
+                Node parent = null;
+                while(minNode != null){
+                    parent = minNode;
+                    minNode = minNode.getLeft(isNumber);
+                }
+                node.setName(parent.getName());
+                node.setNumber(parent.getNumber());
+                node.setAddress(parent.getAddress());
+                node.setRight(recDelete(node.getRight(isNumber), node.getValue(isNumber), isNumber), isNumber);
+                return node;
+            }
+        } 
+        else if(node.isGreaterThan(value, isNumber)) {
+            node.setLeft(recDelete(node.getLeft(isNumber), value, isNumber), isNumber);
+            return node;
+        }
+        else{
+            node.setRight(recDelete(node.getRight(isNumber), value, isNumber), isNumber);
+            return node;
+        }
+    }
 
-			if(node.left == null && node.right == null){
-				if(parent.left.isEqual(value)){
-					parent.left = null;
-				}
-				else{
-					parent.right = null;
-				}
-			}
-			else if(node.left == null ^ node.right == null){
-				if(node.left == null){
-					parent.left = node.right;
-				}
-				else{
-					parent.right = node.left;	
-				}
-			}
-			else{
-				Node minNode = node.right;
-				Node parentMinNode = minNode;
-				while(minNode.left != null){
-					parentMinNode = minNode;
-					minNode = minNode.left;
-				}
-				minNode.right = node.right;
-				minNode.left = node.left;
-				if(parent.left.isEqual(value)){
-					parent.left = minNode;
-
-				}
-				else{
-					parent.right = minNode;
-				}
-				parentMinNode.left = null;
-			}
-		}
-	}
-
-	public void recTraverse(Node node){
+	public void recTraverse(Node node, boolean isNumber){
 		if(node != null){
-			this.recTraverse(node.left);
+			this.recTraverse(node.getLeft(isNumber), isNumber);
 			System.out.print(node);
-			this.recTraverse(node.right);
+			this.recTraverse(node.getRight(isNumber), isNumber);
 		}
 	}
 

@@ -16,9 +16,10 @@ public class PhoneBook{
 		String name = s[0];
 		String address = s[1];
 		String number = s[2];
-		numberTree.add(new Node(number, name, address, number));
-		nameTree.add(new Node(name, name, address, number));
-		System.out.println("Inserted record: " + record);
+        Node node = new Node(name, address, number);
+		numberTree.add(node);
+		nameTree.add(node);
+		System.out.println("Inserted record: " + node);
 	}
 
 	public static void delete(String value, BST numberTree, BST nameTree){
@@ -34,6 +35,7 @@ public class PhoneBook{
 			numberTree.delete(record.number);
 			nameTree.delete(value);
 		}
+        System.out.println("Deleted record: " + record);
 	}
 	public static void find(String value, BST numberTree, BST nameTree){
 		try{

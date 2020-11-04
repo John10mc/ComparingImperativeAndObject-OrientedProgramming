@@ -10,22 +10,22 @@ public class NameBST extends BST{
 
 	@Override
 	public void add(Node node){
-		this.root = this.recAdd(this.root, node, node.name);
+		this.root = this.recAdd(this.root, node, node.name, false);
 	}
 
 	@Override
 	public Node find(String name){
-		return this.recFind(this.root, name);
+		return this.recFind(this.root, name, false);
 	}
 
 	@Override
 	public void delete(String name){
-		this.deleteNode(this.root, name);
+		this.root = this.recDelete(this.root, name, false);
 	}
 
 	@Override
 	public void traverse(){
-		this.recTraverse(this.root);
+		this.recTraverse(this.root, false);
 	}
 
 }
