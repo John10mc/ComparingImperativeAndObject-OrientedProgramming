@@ -1,135 +1,124 @@
-public class BST{
+public abstract class BST{
 	Node root;
 
 	public BST(){
 		root = null;
 	}
 
-	public void add(String value){
-		this.root = this.recAdd(this.root, value);
-	}
+	public abstract void add(Node node);
 
-	public static Node recAdd(Node node, String value){
+	public abstract Node find(String value);
+
+	public abstract void delete(String value);
+
+	public abstract void traverse();
+
+	public Node recAdd(Node node, Node newNode, String value){
 		if(node == null){
-			return new Node(value);
+			return newNode;
 		}
 		if(node.isGreaterThan(value)){
-			node.left = recAdd(node.left, value);
+			node.left = recAdd(node.left, newNode, value);
 		}
 		else{
-			node.right = recAdd(node.right, value);
+			node.right = recAdd(node.right, newNode, value);
 		}
 		//Check to see why its producing an erroe
 		//System.out.print("Error" + value + node.isGreaterThan(value) + "\n");
 		return node;
 	}
 
-	public boolean contains(String check){
-		return this.recContains(this.root, check);
-	}
-
-	public static boolean recContains(Node node, String check){
+	public Node recFind(Node node, String value){
 		if(node == null){
-			return false;
+			return node;
 		}
-		else if(node.value.equals(check)){
-			return true;
+		// try using isEqual
+		else if(node.id.equals(value)){
+			return node;
 		}
-		else if(node.isGreaterThan(check)){
-			return recContains(node.left, check);
+		else if(node.isGreaterThan(value)){
+			return recFind(node.left, value);
 		}
 		else{
-			return recContains(node.right, check);
+			return recFind(node.right, value);
 		}
 	}
 
-	public void delete(String value){
-		Node node = this.root;
+	public void deleteNode(Node node, String value){
 		Node parent = node;
 		if(node.isEqual(value)){
 			if(node.left != null){
-				this.root = node.left;
+				//System.out.println(node.root);
+				node = node.left;
+				//this.recTraverse(node);
+				//System.out.println(node.root);		
 			}
 			else if(node.right != null){
-				this.root = node.right;
-			}
-			else{
-				this.root = null;
-			}
-		}
-		while(!(node.isEqual(value))){
-			if(node.isLessThan(value)){
-				parent = node;
 				node = node.right;
 			}
 			else{
-				parent = node;
-				node = node.left;
-			}
-			//System.out.print("\n" + node.value);
-		}
-		if(node.left == null && node.right == null){
-			//System.out.print("Here");
-			if(parent.left.isEqual(value)){
-				parent.left = null;
-			}
-			else{
-				parent.right = null;
-			}
-		}
-
-		else if(node.left == null ^ node.right == null){
-			if(node.left == null){
-				parent.left = node.right;
-			}
-			else{
-				//System.out.print("Here");
-				parent.right = node.left;	
+				node = null;
 			}
 		}
 		else{
-			Node minNode = node.right;
-			Node parentMinNode = minNode;
-			while(minNode.left != null){
-				parentMinNode = minNode;
-				minNode = minNode.left;
+			while(!(node.isEqual(value))){
+				// System.out.print(node.id + " " + value + "\n");
+				if(node.isLessThan(value)){
+					parent = node;
+					node = node.right;
+				}
+				else{
+					parent = node;
+					node = node.left;
+				}
+				//System.out.print("\n" + node.value);
 			}
-			minNode.right = node.right;
-			minNode.left = node.left;
-			if(parent.left.isEqual(value)){
-				parent.left = minNode;
 
+			if(node.left == null && node.right == null){
+				//System.out.print("Here");
+				if(parent.left.isEqual(value)){
+					parent.left = null;
+				}
+				else{
+					parent.right = null;
+				}
+			}
+			else if(node.left == null ^ node.right == null){
+				if(node.left == null){
+					parent.left = node.right;
+				}
+				else{
+					//System.out.print("Here");
+					parent.right = node.left;	
+				}
 			}
 			else{
-				parent.right = minNode;
+				Node minNode = node.right;
+				Node parentMinNode = minNode;
+				while(minNode.left != null){
+					parentMinNode = minNode;
+					minNode = minNode.left;
+				}
+				minNode.right = node.right;
+				minNode.left = node.left;
+				if(parent.left.isEqual(value)){
+					parent.left = minNode;
+
+				}
+				else{
+					parent.right = minNode;
+				}
+				parentMinNode.left = null;
 			}
-			parentMinNode.left = null;
 		}
 	}
 
 	public void recTraverse(Node node){
 		if(node != null){
 			this.recTraverse(node.left);
-			System.out.print(node.value + " ");
+			System.out.print(node);
 			this.recTraverse(node.right);
 		}
-	}
-
-	public static void main(String[] args){
-	BST tree = new BST();
-	String[] inserts = {"0871234567", "0875678901", "0872345678", "0873456789", "0874567890"};
-	for(int i=0; i<inserts.length; i++){
-		tree.add(inserts[i]);
-		System.out.print(inserts[i] + " ");
-	}
-	System.out.print("\n");
-	tree.recTraverse(tree.root);
-	tree.delete("0871234567");
-	System.out.println();
-	tree.recTraverse(tree.root);
-	System.out.print("\n");
-	System.out.print(tree.contains("0872345678") + "\n");
-	System.out.print(tree.contains("0872345671"));
 	}
 
 }

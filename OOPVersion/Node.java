@@ -1,16 +1,23 @@
 public class Node{
-	String value;
+	String id;
+	String name;
+	String address;
+	String number;
 	Node left;
 	Node right;
 
-	public Node(String value){
-		this.value = value;
+	public Node(String id, String name, String address, String number){
+		this.id = id;
+		this.name = name;
+		this.address = address;
+		this.number = number;
 		left = null;
 		right = null;
 	}
 
 	public boolean isGreaterThan(String value){
-		if(this.value.compareTo(value) > 0){
+		if(this.id.compareTo(value) > 0){
+			//System.out.println(this.id.compareTo(value) + " " + this.id + " " + value);
 			return true;
 		}
 		else{
@@ -19,7 +26,7 @@ public class Node{
 	}
 
 	public boolean isLessThan(String value){
-		if(this.value.compareTo(value) < 0){
+		if(this.id.compareTo(value) < 0){
 			return true;
 		}
 		else{
@@ -27,7 +34,11 @@ public class Node{
 		}
 	}
 
-	public boolean isEqual(String node){
-		return value.equals(this.value);
+	public boolean isEqual(String value){
+		return this.id.equals(value);
+	}
+
+	public String toString(){
+		return "Name: " + this.name + "\n" + "Address:" + this.address  + "\n" + "Number:" + this.number + "\n\n";
 	}
 }
