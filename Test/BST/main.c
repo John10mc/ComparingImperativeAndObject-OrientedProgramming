@@ -4,7 +4,7 @@
 struct node{
     int value;
     int null;
-    struct node* left;
+    struct node left;
     struct node *right;
 };
 
@@ -43,14 +43,10 @@ int main(){
     int nodes[] = {57, 10, 93, 88, 77, 74, 78};
     size_t nodesLength = sizeof(nodes) / sizeof(nodes[0]);
     struct tree bst;
-    struct node* root = NULL;
-    struct node* left = NULL;
-    struct node* right = NULL;
+    struct node newNode;
     newNode.value = NULL;
     newNode.null = NULL;
-    bst->root = root;
-    root->left = left;
-    root->right = right
+    bst.root = newNode;
     for(int i=0; i < nodesLength; i++){
         bst.root = add(bst.root, nodes[i]);
     }
