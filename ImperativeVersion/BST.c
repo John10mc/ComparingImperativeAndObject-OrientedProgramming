@@ -3,7 +3,6 @@
 
 struct node{
     int value;
-    int null;
     struct node* left;
     struct node *right;
 };
@@ -12,16 +11,16 @@ struct tree{
     struct node root;
 };
 
-struct node *add(struct node root, int value){
-    if(root.null == NULL){
-        struct node newNode;
-        newNode.value = value;
-        newNode.null = 0;
+struct node* add(struct node *root, int value){
+    if(root == NULL){
+        struct node* newNode;
+        newNode = (struct node*)malloc(sizeof(struct node));
+        newNode->value = value;
         //printf("Value: %d", newNode.value);
-        return &newNode;
+        return newNode;
     }
-    else if(value < root.value){
-        root.left = add(root.left, value);
+    else if(value < root->value){
+        root->left = add(root->left, value);
     }
     else{
         root->right = add(root->right, value);
@@ -29,10 +28,10 @@ struct node *add(struct node root, int value){
 };
 
 struct node *traverse(struct node *root){
-    if(root->value != NULL){
+    if(root != NULL){
         //printf("Here2");
         traverse(root->left);
-        printf("Value: %d", root->value);
+        printf("Value: %d\n", root->value);
         traverse(root->right);
         //printf("test2");
     }
@@ -42,20 +41,17 @@ struct node *traverse(struct node *root){
 int main(){
     int nodes[] = {57, 10, 93, 88, 77, 74, 78};
     size_t nodesLength = sizeof(nodes) / sizeof(nodes[0]);
-    struct tree bst;
+
     struct node* root = NULL;
-    struct node* left = NULL;
-    struct node* right = NULL;
-    newNode.value = NULL;
-    newNode.null = NULL;
-    bst->root = root;
-    root->left = left;
-    root->right = right
+    //struct node* left = NULL;
+    //struct node* right = NULL;
+
+
+    //root->left = left;
+    //root->right = right;
+
     for(int i=0; i < nodesLength; i++){
-        bst.root = add(bst.root, nodes[i]);
+        root = add(root, nodes[i]);
     }
-    printf("before");
-    printf(bst.root);
-    //traverse(bst.root);
-    printf("after");
+    traverse(root);
 }
