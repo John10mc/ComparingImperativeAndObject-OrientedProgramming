@@ -3,35 +3,68 @@
 #include <string.h>
 
 struct node{
-    int value;
     struct node* left;
     struct node *right;
+    char *value;
 };
 
 struct tree{
     struct node root;
 };
 
-struct node* add(struct node *root, int value){
+int compareTo(char *s1, char *s2){
+    size_t lenS1 = strlen(s1);
+    size_t lenS2 = strlen(s2);
+    int len;
+    if(lenS1 > lenS2){
+        len = lenS2;
+    }
+    else{
+        len = lenS1;
+    }
+    for(int i = 0; i <= len; i++){
+        if(s1[i] > s2[i]){
+            return 1;
+        }
+        else if(s1[i] < s2[i]){
+            return -1;
+        }
+    }
+    if(len == lenS2){
+        return 0;
+    }
+    else if(lenS1 > lenS2){
+        return 1;
+    }
+    else{
+        return -1;
+    }
+}
+
+struct node* add(struct node *root, char *value){
     if(root == NULL){
-        struct node* newNode = (struct node*)malloc(sizeof(struct node));
-        newNode->value = value;
-        //printf("Value: %d", newNode.value);
+        struct node *newNode = (struct node*)malloc(sizeof(struct node));
+        (newNode)->value = malloc(sizeof(value));
+        strcpy((newNode)->value, value);
+        //newNode->value = value;
+        //printf("Value: %1s", newNode->value);
         return newNode;
     }
-    else if(value < root->value){
+    else if(compareTo(value, root->value) == 1){
+        //printf("Left");
         root->left = add(root->left, value);
     }
     else{
+        //printf("Right");
         root->right = add(root->right, value);
     }
 };
 
-struct node* find(struct node *root, int value){
-    if(root->value == value){
+struct node* find(struct node *root, char *value){
+    if(compareTo(value, root->value) == 0){
         return root;
     }
-    else if(value < root->value){
+    else if(compareTo(value, root->value) == -1){
         return find(root->left, value);
     }
     else{
@@ -39,14 +72,14 @@ struct node* find(struct node *root, int value){
     }
 };
 
-struct node* delete(struct node *root, int value){
+struct node* delete(struct node *root, char *value){
     if(root == NULL){
         return NULL;
     }
-    else if(value > root->value){
+    else if(compareTo(value, root->value) == -1){
         root->right = delete(root->right, value);
     }
-    else if(value < root->value){
+    else if(compareTo(value, root->value) == 1){
         root->left = delete(root->left, value);  
     }
     else{
@@ -78,20 +111,16 @@ struct node *traverse(struct node *root){
     if(root != NULL){
         //printf("Here2");
         traverse(root->left);
-        printf("Value: %d\n", root->value);
+        printf("Value: %s\n", root->value);
         traverse(root->right);
         //printf("test2");
     }
 };
 
-
 int main(){
-    //printf("here");
-    int nodes[] = {57, 10, 93, 88, 77, 74, 78};
-    size_t nodesLength = sizeof(nodes) / sizeof(nodes[0]);
     char line[200];
     char name[50];
-    char *names[5];
+    struct node* root = NULL;
     FILE *file = fopen("data.txt", "r");
 
     int i = 0;
@@ -102,29 +131,22 @@ int main(){
             name[i] = line[i];
             i++;
         }
-        i = 0;
-        printf("%s\n", name);
+        root = add(root, name);
+        //printf("%s\n", name);
         memset(&name[0], 0, sizeof(name));
-        strcpy(&names[nameIndex], name);
-        nameIndex++;
+        i = 0;
     }
 
-    printf("%s", names[2]);
     
     //fclose(file);
 
-    // struct node* root = NULL;
+    //printf("Root: %s\n", root->left->value);
+    traverse(root);
 
-    // for(int i=0; i < nodesLength; i++){
-    //     root = add(root, nodes[i]);
-    // }
-    // printf("Root: %d\n", root->left->value);
-    // traverse(root);
-
-    // struct node* found = find(root, 93);
-    // printf("Found value: %d\n", found->value);
+    struct node* found = find(root, "James");
+    printf("Found value: %s\n", found->value);
 
 
-    // delete(root, 74);
-    // traverse(root);
+    delete(root, "James");
+    traverse(root);
 }
