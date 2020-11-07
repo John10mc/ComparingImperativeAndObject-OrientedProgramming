@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 struct node{
     char *name;
@@ -14,6 +15,11 @@ struct tree{
     struct tree *left;
     struct tree *right;
 };
+
+// struct bst{
+//     struct tree *numberTree;
+//     struct tree 
+// }
 
 int compareTo(char *s1, char *s2){
     size_t lenS1 = strlen(s1);
@@ -44,13 +50,43 @@ int compareTo(char *s1, char *s2){
     }
 };
 
+struct tree* recFind(struct tree *root, char *id){
+    if(root == NULL){
+        return NULL;
+    }
+    else if(compareTo(id, root->id) == 0){
+        return root;
+    }
+    else if(compareTo(id, root->id) == -1){
+        return recFind(root->left, id);
+    }
+    else{
+        return recFind(root->right, id);
+    }
+};
+
+struct tree* find(struct tree *nameTree, struct tree *numberTree, char *id){
+    struct tree* found;
+    if(isalpha(id[0])){
+        found = recFind(nameTree, id);
+    }
+    else{
+        found = recFind(numberTree, id);
+    }
+    if(found != NULL){
+        printf("Found record: %s, %s, %s.\n",(found)->record->name, (found)->record->address, (found)->record->number);
+    }
+    else{
+        printf("Could not find record: %s.\n", id);
+    }
+}
+
 struct tree* add(struct tree *root, struct node *newNode, char *value){
     if(root == NULL){
         struct tree *newTree = (struct tree*)malloc(sizeof(struct tree));
         newTree->record = newNode;
         newTree->id = value;
 
-        printf("Inserted record: %s, %s, %s\n",(newNode)->name, (newNode)->address, (newNode)->number);
         return newTree;
     }
     else if(compareTo(value, root->id) == -1){
@@ -62,63 +98,73 @@ struct tree* add(struct tree *root, struct node *newNode, char *value){
         root->right = add(root->right, newNode, value);
     }
     else{
-        printf("Record: %s, %s, %s already exists in phonebook.\n",(newNode)->name, (newNode)->address, (newNode)->number);
+        
         return root;
     }
 };
 
-struct tree* find(struct tree *root, char *id){
-    if(compareTo(id, root->id) == 0){
-        return root;
+struct tree* recDelete(struct tree *root, char *id){
+    if(root == NULL){
+        return NULL;
     }
     else if(compareTo(id, root->id) == 1){
-        return find(root->left, id);
+        root->right = recDelete(root->right, id);
+    }
+    else if(compareTo(id, root->id) == -1){
+        root->left = recDelete(root->left, id);  
     }
     else{
-        return find(root->right, id);
+        if(root->left == NULL && root->right == NULL){
+            return NULL;
+        }
+        else if(root->left == NULL || root->right == NULL){
+            if(root->left == NULL){
+                return root->right;
+            }
+            else{
+                return root->left;  
+            }
+        }
+        else{
+            struct tree* minNode = root->right;
+            struct tree* parentNode;
+            while(minNode != NULL){
+                parentNode = minNode;
+                minNode = minNode->left;
+            }
+            root->id = parentNode->id;
+            root->record->name = parentNode->record->name;
+            root->record->address = parentNode->record->address;
+            root->record->number = parentNode->record->number;
+            root->right = recDelete(root->right, parentNode->id);
+        }
     }
 };
 
-// struct node* delete(struct node *root, char *name){
-//     if(root == NULL){
-//         return NULL;
-//     }
-//     else if(compareTo(name, root->name) == -1){
-//         root->right = delete(root->right, name);
-//     }
-//     else if(compareTo(name, root->name) == 1){
-//         root->left = delete(root->left, name);  
-//     }
-//     else{
-//         if(root->left == NULL && root->right == NULL){
-//             return NULL;
-//         }
-//         else if(root->left == NULL || root->right == NULL){
-//             if(root->left == NULL){
-//                 return root->right;
-//             }
-//             else{
-//                 return root->left;  
-//             }
-//         }
-//         else{
-//             struct node* minNode = root->right;
-//             struct node* parentNode;
-//             while(minNode != NULL){
-//                 parentNode = minNode;
-//                 minNode = minNode->left;
-//             }
-//             root->name = parentNode->name;
-//             root->right = delete(root->right, parentNode->name);
-//         }
-//     }
-// };
+struct tree* delete(struct tree *nameTree, struct tree *numberTree, char *id){
+    struct tree* found;
+    if(isalpha(id[0])){
+        found = recFind(nameTree, id);
+    }
+    else{
+        found = recFind(numberTree, id);
+    }
+    if(found != NULL){
+        recDelete(nameTree, found->record->name);
+        recDelete(numberTree, found->record->number);
+        printf("Deleted record: %s, %s, %s\n", found->record->name, found->record->address, found->record->number);
+    }
+    else{
+        printf("Could not delete record: %s. Could not be found.\n", id);
+    }
+
+};
 
 struct node *traverse(struct tree *root){
     if(root != NULL){
         //printf("Here2");
         traverse(root->left);
-        printf("Value: %s, %s, %s\n", root->record->name, root->record->address, root->record->number);
+        printf("Record: %s, %s, %s\n", root->record->name, root->record->address, root->record->number);
         traverse(root->right);
         //printf("test2");
     }
@@ -168,11 +214,16 @@ int main(){
         strcpy((newNode)->name, name);
         strcpy((newNode)->address, address);
         strcpy((newNode)->number, number);
+ 
+        if(recFind(nameTree, newNode->name) == NULL){
+            nameTree = add(nameTree, newNode, newNode->name);
+            numberTree = add(numberTree, newNode, newNode->number);
+            printf("Inserted record: %s, %s, %s\n",(newNode)->name, (newNode)->address, (newNode)->number);
+        }
+        else{
+            printf("Record: %s, %s, %s already exists in phonebook.\n",(newNode)->name, (newNode)->address, (newNode)->number);
+        }
 
-        nameTree = add(nameTree, newNode, newNode->name);
-        numberTree = add(numberTree, newNode, newNode->number);
-
-        //printf(" record: %s, %s, %s\n",name, address, number);
         memset(&name[0], 0, sizeof(name));
         memset(&address[0], 0, sizeof(address));
         memset(&number[0], 0, sizeof(number));
@@ -180,21 +231,35 @@ int main(){
         j = 0;
     }
 
+    printf("\n");
     traverse(nameTree);
     printf("\n");
     traverse(numberTree);
-    //fclose(file);
+    // //fclose(file);
 
-    //printf("Root: %s\n", root->left->value);
-    //traverse(root);
+    printf("\n");
+    find(nameTree, numberTree, "Max");
+    printf("\n");
 
-    struct tree* foundName = find(nameTree, "James");
-    printf("Found record: %s, %s, %s.\n",(foundName)->record->name, (foundName)->record->address, (foundName)->record->number);
+    traverse(nameTree);
+    printf("\n");
+    delete(nameTree, numberTree ,"James");
+    printf("\n");
+    traverse(numberTree);
+    printf("\n");
+    traverse(nameTree);
+    printf("\n");
+    delete(nameTree, numberTree ,"James");
+    printf("\n");
 
-    struct tree* foundNumber = find(numberTree, "508-934-1199");
-    printf("Found record: %s, %s, %s.\n",(foundNumber)->record->name, (foundNumber)->record->address, (foundNumber)->record->number);
-
-
-    //delete(root, "James");
-    //traverse(root);
+    traverse(numberTree);
+    printf("\n");
+    delete(nameTree, numberTree ,"530-841-5851");
+    printf("\n");
+    traverse(nameTree);
+    printf("\n");
+    traverse(numberTree);
+    printf("\n");
+    delete(nameTree, numberTree ,"530-841-5851");
+    printf("\n");
 };
