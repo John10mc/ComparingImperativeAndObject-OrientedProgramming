@@ -1,105 +1,68 @@
 import java.io.File; 
 import java.util.Scanner;
 import java.io.FileNotFoundException;
+import java.lang.String;
 
 public class PhoneBook{
-	private static BST numberTree;
-	private static BST nameTree;
 
-	public PhoneBook(){
-		numberTree = new NumberBST();
-		nameTree = new NameBST();
-	}
+    public static void main(String[] args){
+        BST bst = new BST();
+        File file = new File("../data.txt");
+        Scanner scanner = null;
+        try {
+            scanner = new Scanner(file);
+        } catch (FileNotFoundException error){
+            System.out.println("File not found");
+        }
 
-	public static void add(String record, BST numberTree, BST nameTree){
-		String[] s = record.split(", ");
-		String name = s[0];
-		String address = s[1];
-		String number = s[2];
-        Node node = new Node(name, address, number);
-		numberTree.add(node);
-		nameTree.add(node);
-		System.out.println("Inserted record: " + node);
-	}
+        while(scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] splitLine = line.split(", ");
+            String name = splitLine[0];
+            String address = splitLine[1];
+            String number = splitLine[2].trim();
+            Node newNode = new Node(name, address, number);
+            bst.add(newNode);
+        }
 
-	public static void delete(String value, BST numberTree, BST nameTree){
-		try{
-			Integer.parseInt(value.substring(0, 1));
-			Node record = numberTree.find(value);
-			System.out.println(record);
-			nameTree.delete(record.name);
-			numberTree.delete(value);
-		} 
-		catch(NumberFormatException error){
-			Node record = nameTree.find(value);
-			numberTree.delete(record.number);
-			nameTree.delete(value);
-		}
-        System.out.println("Deleted record: " + record);
-	}
-	public static void find(String value, BST numberTree, BST nameTree){
-		try{
-			Integer.parseInt(value.substring(0, 1));
-			System.out.print(numberTree.find(value));
+        System.out.printf("\n");
+        bst.traverse(bst.nameTree);
+        System.out.printf("\n");
+        bst.traverse(bst.numberTree);
 
-		} 
-		catch(NumberFormatException error){
-			System.out.print(nameTree.find(value));
-		}
-	}
+        System.out.printf("\n");
+        bst.find("Max");
+        System.out.printf("\n");
+        bst.find("305-896-0661");
+        System.out.printf("\n");
+        bst.find("Brian Ruble");
+        System.out.printf("\n");
 
-	public static void print(BST nameTree){
-		numberTree.traverse();
-	}
+        bst.traverse(bst.nameTree);
+        System.out.printf("\n");
 
-	public static void main(String[] args){
-		PhoneBook phoneBook = new PhoneBook();
+        bst.delete("Brian Ruble");
+        System.out.printf("\n");
+        bst.traverse(bst.nameTree);
+        System.out.printf("\n");
+        bst.traverse(bst.numberTree);
+        System.out.printf("\n");
 
-		File file = new File("./data.txt");
-		Scanner scanner = null;
-		try {
-			scanner = new Scanner(file);
-		} catch (FileNotFoundException error){
-			System.out.println("File not found");
-		}
+        bst.delete("Brian Ruble");
+        System.out.printf("\n");
 
-		while(scanner.hasNextLine()) {
-			String record = scanner.nextLine();
-			add(record, numberTree, nameTree);
-		}
-		scanner.close();
+        bst.traverse(bst.numberTree);
+        System.out.printf("\n");
 
-	    scanner = new Scanner(System.in);
-	    System.out.print("\nType add followed by name, address, number to add a record\ne.g add James Toscano, 38 Carolyns Circle Dallas, 214-7462-112\n\n" +
-	    	"Type delete followed by a name or number to delete that record\ne.g delete James Toscano\n\n" + 
-	    	"Type find followed by a name or a number to find that record\ne.g James Toscano\n\n" +
-	    	"Type print to list all records\n\n" +
-	    	"Type quit to stop the program\n");
-	    boolean keepGoing = true;
-	    String command;
-		while(keepGoing){
-		    command = scanner.nextLine();
-    		String[] s = command.split(" ");
-			String action = s[0];
-		    if(action.equals("add")){
-		    	//System.out.println("Test");
-		    	add(command.substring(4, command.length()), numberTree, nameTree);
-		    }
-		    else if(action.equals("delete")){
-		    	delete(command.substring(7, command.length()), numberTree, nameTree);
-		    }
-		    else if(action.equals("find")){
-		    	find(command.substring(5, command.length()), numberTree, nameTree);
-		    }
-		    else if(action.equals("print")){
-		    	print(nameTree);
-		    }
-		    else if(action.equals("quit")){
-		    	keepGoing = false;
-		    }
-		    else{
-		    	System.out.println("Command not found. Try again.");
-		    }
-		}
-	}
+        bst.delete("305-896-0661");
+        System.out.printf("\n");
+        bst.traverse(bst.nameTree);
+        System.out.printf("\n");
+        bst.traverse(bst.numberTree);
+        System.out.printf("\n");
+
+        bst.delete("305-896-0661");
+        System.out.printf("\n");
+
+    }
 }
