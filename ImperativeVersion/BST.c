@@ -64,7 +64,7 @@ int compareTo(char *s1, char *s2){
 
 // recFind is used to find if an element is in the tree and return if it is.
 struct tree* recFind(struct tree *root, char *id){
-    // element not found. At leaf node or root
+    // element not found
     if(root == NULL){
         return NULL;
     }
@@ -89,7 +89,7 @@ struct tree* recFind(struct tree *root, char *id){
 void find(struct binarySearchTree *bst, char *id){
     struct tree* found;
 
-    // check if the first character is a letter. If it is use the nameTree to search
+    // check if the first character is a letter. If it is, use the nameTree to search
     if(isalpha(id[0])){
         found = recFind(bst->nameTree, id);
     }
@@ -140,33 +140,44 @@ void add(struct binarySearchTree *bst, struct node *newNode){
 
     // check to see that the record doesnt exist in the trees already
     if(recFind(bst->nameTree, newNode->name) == NULL){
+
         // find the appropriate leaf node in numberTree and add the newNode there then store the new tree
         bst->numberTree = recAdd(bst->numberTree, newNode, newNode->number);
+
         // find the appropriate leaf node in nameTree and add the newNode there then store the new tree
         bst->nameTree = recAdd(bst->nameTree, newNode, newNode->name);
         printf("Inserted record: %s, %s, %s\n",(newNode)->name, (newNode)->address, (newNode)->number);
     }
+
     // node is already in the trees
     else{
         printf("Record: %s, %s, %s already exists in phonebook.\n",(newNode)->name, (newNode)->address, (newNode)->number);
     }
 };
 
-// recDelete is used to 
+// recDelete is used to find the position of a node and delete if from the tree
 struct tree* recDelete(struct tree *root, char *id){
     if(root == NULL){
         return NULL;
     }
+
+    // if id string is greater than the roots string then continue from the next right sub tree 
     else if(compareTo(id, root->id) == 1){
         root->right = recDelete(root->right, id);
     }
+    // if id string is less than the roots string then continue from the next left sub tree 
     else if(compareTo(id, root->id) == -1){
         root->left = recDelete(root->left, id);  
     }
+
+    // sub tree to delete was found
     else{
+
+        // if both the left and right sub tree roots are empty remove the current sub tree
         if(root->left == NULL && root->right == NULL){
             return NULL;
         }
+        // if either the left or the right is empty remove the left or right respectively
         else if(root->left == NULL || root->right == NULL){
             if(root->left == NULL){
                 return root->right;
@@ -175,13 +186,19 @@ struct tree* recDelete(struct tree *root, char *id){
                 return root->left;  
             }
         }
+        
+        // both left are right are not empty
         else{
+
+            // find the smallest node to the right of the current node
             struct tree* minNode = root->right;
             struct tree* parentNode;
             while(minNode != NULL){
                 parentNode = minNode;
                 minNode = minNode->left;
             }
+
+            // set the node to be deleted to the smallest node and delete the smallest node
             root->id = parentNode->id;
             root->record->name = parentNode->record->name;
             root->record->address = parentNode->record->address;
@@ -191,35 +208,43 @@ struct tree* recDelete(struct tree *root, char *id){
     }
 };
 
-struct binarySearchTree* delete(struct binarySearchTree *bst, char *id){
+// delete function calls recDelete for both the numberTree and nameTree with the appropriate value to delete the right sub tree
+void delete(struct binarySearchTree *bst, char *id){
     struct tree* found;
+
+    // check if the id of the node to be deleted is a phone number. Find the record that has to be deleted
     if(isalpha(id[0])){
         found = recFind(bst->nameTree, id);
     }
     else{
         found = recFind(bst->numberTree, id);
     }
+
+    // If the record was found then delete it from both trees
     if(found != NULL){
         printf("Deleted record: %s, %s, %s\n", found->record->name, found->record->address, found->record->number);
         recDelete(bst->nameTree, found->record->name);
         recDelete(bst->numberTree, found->record->number);
     }
+
+    // if it couldnt be found print that it couldnt be found
     else{
         printf("Could not delete record: %s. Could not be found.\n", id);
     }
 };
 
+// traverse the tree from smallest to highest and print the record
 void *traverse(struct tree *root){
     if(root != NULL){
-        //printf("Here2");
         traverse(root->left);
         printf("Record: %s, %s, %s\n", root->record->name, root->record->address, root->record->number);
         traverse(root->right);
-        //printf("test2");
     }
 };
 
 int main(){
+
+    //create the structure of the binary bearch tree with two trees. One that is based on the name of the record and one on the number
     struct binarySearchTree *bst= (struct binarySearchTree*)malloc(sizeof(struct binarySearchTree));
     struct tree *nameTree = NULL;
     struct tree *numberTree = NULL;
@@ -239,7 +264,11 @@ int main(){
 
     int i = 0;
     int j = 0;
+
+    // read line by line of a file
     while (fgets(line, 200, file) != NULL) {
+
+        // go till a , is encounted. This is the name
         while(line[i] != ','){
             name[j] = line[i];
             i++;
@@ -247,6 +276,8 @@ int main(){
         }
         i += 2;
         j = 0;
+
+        // go till a , is encounted. This is the address
         while(line[i] != ','){
             address[j] = line[i];
             i++;
@@ -254,14 +285,18 @@ int main(){
         }
         i += 2;
         j = 0;
+
+        // go till a \0 is encounted. This is the number
         while(line[i] != '\0'){
             number[j] = line[i];
             i++;
             j++;
         }
 
+        // remove the new line character
         number[strcspn(number, "\n")] = 0;
 
+        // create a node based on the line read in above
         struct node *newNode = (struct node*)malloc(sizeof(struct node));
         (newNode)->name = malloc(sizeof(name));
         (newNode)->address = malloc(sizeof(address));
@@ -271,9 +306,11 @@ int main(){
         strcpy((newNode)->address, address);
         strcpy((newNode)->number, number);
 
+        // add the node to the binary search tree
         add(bst, newNode);
         //free(newNode);
 
+        // clear the variables
         memset(&name[0], 0, sizeof(name));
         memset(&address[0], 0, sizeof(address));
         memset(&number[0], 0, sizeof(number));
@@ -282,11 +319,13 @@ int main(){
         j = 0;
     }
 
+        // test to see if the records were added properply
         printf("\n");
         traverse(bst->nameTree);
         printf("\n");
         traverse(bst->numberTree);
 
+        // test to see if a value can be found in the trees
         printf("\n");
         find(bst, "Max");
         printf("\n");
@@ -298,6 +337,7 @@ int main(){
         traverse(bst->nameTree);
         printf("\n");
 
+        // test to see if names can be deleted from the trees
         delete(bst, "Brian Ruble");
         printf("\n");
         traverse(bst->nameTree);
@@ -305,12 +345,14 @@ int main(){
         traverse(bst->numberTree);
         printf("\n");
 
+        // test what happens when you try to delete a value thats not in the tree
         delete(bst, "Brian Ruble");
         printf("\n");
 
         traverse(bst->numberTree);
         printf("\n");
 
+        // test to see if numbers can be deleted from the trees
         delete(bst, "305-896-0661");
         printf("\n");
         traverse(bst->nameTree);
